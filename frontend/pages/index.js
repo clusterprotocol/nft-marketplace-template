@@ -64,7 +64,7 @@ export default function Home() {
             console.log("Response:", response);
             if (response.ok) tokenData = await response.json();
           } catch (error) {
-            console.error("Error fetching metadata:", error);
+            console.log("Error fetching metadata:", error);
           }
 
           return {
@@ -81,7 +81,7 @@ export default function Home() {
       );
       setNfts(items);
     } catch (error) {
-      console.error("Error loading NFTs:", error);
+      console.log("Error loading NFTs:", error);
       setError(`Failed to load NFTs: ${error.message}`);
     } finally {
       setLoading(false);
@@ -123,7 +123,7 @@ export default function Home() {
             console.log("Response:", response);
             if (response.ok) tokenData = await response.json();
           } catch (error) {
-            console.error("Error fetching metadata:", error);
+            console.log("Error fetching metadata:", error);
           }
 
           return {
@@ -143,7 +143,7 @@ export default function Home() {
 
       setMyNft(nftDetails);
     } catch (err) {
-      console.error("Failed to load NFTs:", err);
+      console.log("Failed to load NFTs:", err);
     } finally {
       setLoading(false);
     }
@@ -176,7 +176,7 @@ export default function Home() {
       await transaction.wait();
       await loadNFTs();
     } catch (error) {
-      console.error("Error buying NFT:", error);
+      console.log("Error buying NFT:", error);
 
       // Handle specific error cases
       if (error.code === "INSUFFICIENT_FUNDS") {
@@ -231,7 +231,7 @@ export default function Home() {
       await transaction.wait();
       await loadNFTs();
     } catch (error) {
-      console.error("Error creating NFT:", error);
+      console.log("Error creating NFT:", error);
       setError(`Failed to create NFT: ${error.message}`);
     } finally {
       setCreateNftLoading(false);
@@ -253,7 +253,7 @@ export default function Home() {
       setError("");
       await loadNFTs();
     } catch (error) {
-      console.error("Error connecting wallet:", error);
+      console.log("Error connecting wallet:", error);
       setError("Failed to connect wallet. See console for details.");
     }
   }
