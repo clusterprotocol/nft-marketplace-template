@@ -2,8 +2,6 @@ const fs = require("fs");
 const path = require("path");
 const solc = require("solc");
 
-const contractFile = "NFTMarketplace.sol";
-const contractPath = path.join(__dirname, contractFile);
 const buildPath = path.join(__dirname, "build");
 
 // Ensure build directory exists
@@ -11,7 +9,21 @@ if (!fs.existsSync(buildPath)) {
   fs.mkdirSync(buildPath);
 }
 
-const source = fs.readFileSync(contractPath, "utf8");
+// Read all .sol files in the current (blockchain root) directory
+const solFiles = fs.readdirSync(__dirname).filter(file => file.endsWith(".sol"));
+console.log(solFiles)
+
+if (solFiles.length === 0) {
+  console.error("No Solidity files found in the blockchain root folder.");
+  process.exit(1);
+}
+
+// Build the sources object only for your own Solidity files
+const sources = {};
+solFiles.forEach(file => {
+  const filePath = path.join(__dirname, file);
+  sources[file] = { content: fs.readFileSync(filePath, "utf8") };
+});
 
 // Import callback specifically for OpenZeppelin 4.9
 function findImports(importPath) {
@@ -30,9 +42,7 @@ function findImports(importPath) {
 
 const input = {
   language: "Solidity",
-  sources: {
-    [contractFile]: { content: source },
-  },
+  sources,
   settings: {
     outputSelection: {
       "*": {
@@ -43,7 +53,7 @@ const input = {
 };
 
 const output = JSON.parse(solc.compile(JSON.stringify(input), { import: findImports }));
-
+console.log(output)
 // Error handling
 if (output.errors) {
   output.errors.forEach(err => {
@@ -54,23 +64,29 @@ if (output.errors) {
   }
 }
 
-// Write separate ABI and BIN files
-for (const contractName in output.contracts[contractFile]) {
-  const contract = output.contracts[contractFile][contractName];
-  
-  // Write ABI to file
-  fs.writeFileSync(
-    path.join(buildPath, `${contractName}.abi`),
-    JSON.stringify(contract.abi, null, 2)
-  );
-  
-  // Write bytecode to file
-  fs.writeFileSync(
-    path.join(buildPath, `${contractName}.bin`),
-    contract.evm.bytecode.object
-  );
-  
-  console.log(`✅ Compiled ${contractName} successfully!`);
-  console.log(`- ABI saved to: ${path.join(buildPath, `${contractName}.abi`)}`);
-  console.log(`- Bytecode saved to: ${path.join(buildPath, `${contractName}.bin`)}`);
-}
+// Write separate ABI and BIN files for contracts from only the local sources
+Object.keys(sources).forEach(sourceFile => {
+  if (!output.contracts[sourceFile]) {
+    console.warn(`No contracts compiled from ${sourceFile}`);
+    return;
+  }
+  for (const contractName in output.contracts[sourceFile]) {
+    const contract = output.contracts[sourceFile][contractName];
+
+    // Write ABI to file
+    fs.writeFileSync(
+      path.join(buildPath, `${contractName}.abi`),
+      JSON.stringify(contract.abi, null, 2)
+    );
+
+    // Write bytecode to file
+    fs.writeFileSync(
+      path.join(buildPath, `${contractName}.bin`),
+      contract.evm.bytecode.object
+    );
+
+    console.log(`✅ Compiled ${contractName} from ${sourceFile} successfully!`);
+    console.log(`- ABI saved to: ${path.join(buildPath, `${contractName}.abi`)}`);
+    console.log(`- Bytecode saved to: ${path.join(buildPath, `${contractName}.bin`)}`);
+  }
+});
