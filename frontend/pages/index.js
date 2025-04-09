@@ -21,7 +21,7 @@ export default function Home() {
 
   function resolveIPFS(uri) {
     if (!uri) return "";
-    return uri.replace(/^ipfs:\/\//, "https://nftstorage.link/ipfs/");
+    return urreplace(/^ipfs:\/\//, "https://nftstorage.link/ipfs/");
   }
 
   async function loadNFTs() {
@@ -127,10 +127,10 @@ export default function Home() {
           }
 
           return {
-            tokenId: i.tokenId.toString(),
-            seller: i.seller,
-            owner: i.owner,
-            price: ethers.formatEther(i.price),
+            tokenId: item.tokenId.toString(),
+            seller: item.seller,
+            owner: item.owner,
+            price: ethers.formatEther(item.price),
             name: tokenData.name,
             description: tokenData.description,
             image: tokenData.image,
