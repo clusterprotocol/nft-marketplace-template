@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import NFTMarketplace from "../contracts/NFTMarketplace.json";
-import contractAddress from "../contracts/contract-address.json";
+import NFTMarketplace from "../contracts/NFTMarketplace-abi.json";
+import contractAddress from "../contracts/NFTMarketplace-address.json";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { NFTGrid } from "@/components/NFTGrid";
